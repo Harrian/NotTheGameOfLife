@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <queue>
+#include <ctime>
 
 #define NUM_THREADS 8
 pthread_mutex_t mutexlock;
@@ -35,13 +36,14 @@ int SumOfNeighbors(int **a, int b, int c){
 }
 void *processNextGen(void *param){
   std::queue<pthreadnode *> * jobqueue = (std::queue<pthreadnode *> *)param;
-  jobqueue->front();
   pthreadnode * job=NULL;
   int temp=0;
   while(!jobqueue->empty()){
     pthread_mutex_lock(&mutexlock);
-    job=jobqueue->front();
-    jobqueue->pop();
+    if(!jobqueue->empty()){
+      job=jobqueue->front();
+      jobqueue->pop();
+    }
     pthread_mutex_unlock(&mutexlock);
     if(job!=NULL){
       for(int i=1;i<job->getCols()-1;i++){
@@ -101,11 +103,10 @@ void nextGeneration(int ***a,int b, int c){
     pthread_create( &tids[i], NULL, processNextGen, (void *) &queueofdata);
   }
   void*status;
-  for (i=0; i < NUM_THREADS; i++)
-	{
-		pthread_join( tids[i], &status );
+  for(i=0;i<NUM_THREADS;i++){
+    pthread_join( tids[i], &status );
   }
-  deleteTwoDArray(d,b);
+ deleteTwoDArray(d,b);
   *a=e;
   return;
 }
@@ -119,15 +120,20 @@ void printTwoDArray(int ** a, int b, int c){
   return;
 }
 
-int main(void){
+int main(int argc, char *argv[]){
   pthread_mutex_init(&mutexlock,NULL);
   int **b = createTwoDArray(8,8,20);
   printTwoDArray(b,8,8);
   int i=0;
-  for(i=0;i<500;i++){
+  int numofgen=atoi(argv[1]);
+  clock_t start,end;
+  start=clock();
+  for(i=0;i<numofgen;i++){
     nextGeneration(&b,8,8);
   }
-  printf("\n");
+  end=clock();
+  printf("Time spent:%f\n",((double)(end-start)) / CLOCKS_PER_SEC);
   printTwoDArray(b,8,8);
+  pthread_mutex_destroy(&mutexlock);
   return 0;
 }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 /*
 void deleteTwoDArray(int ***a, int b){
   int ** c= *a;
@@ -132,11 +133,18 @@ void printTwoDArray(int ** a, int b, int c){
   return;
 }
 
-int main(void){
+int main(int argc, char *argv[]){
   int **b = createTwoDArray(8,8,20);
   printTwoDArray(b,8,8);
-  nextGeneration(&b,8,8);
-  printf("\n");
+  int i=0;
+  int numofgen=atoi(argv[1]);
+  clock_t start,end;
+  start=clock();
+  for(i=0;i<numofgen;i++){
+    nextGeneration(&b,8,8);
+  }
+  end=clock();
+  printf("Time spent:%f\n",((double)(end-start)) / CLOCKS_PER_SEC);
   printTwoDArray(b,8,8);
   return 0;
 }
