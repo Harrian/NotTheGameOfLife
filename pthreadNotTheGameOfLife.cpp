@@ -107,6 +107,7 @@ void nextGeneration(int ***a,int b, int c){
   }
   deleteTwoDArray(d,b);
   *a=e;
+  return;
 }
 void printTwoDArray(int ** a, int b, int c){
   int i=0,j=0;
@@ -122,7 +123,10 @@ int main(void){
   pthread_mutex_init(&mutexlock,NULL);
   int **b = createTwoDArray(8,8,20);
   printTwoDArray(b,8,8);
-  nextGeneration(&b,8,8);
+  int i=0;
+  for(i=0;i<500;i++){
+    nextGeneration(&b,8,8);
+  }
   printf("\n");
   printTwoDArray(b,8,8);
   return 0;
